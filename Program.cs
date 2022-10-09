@@ -1,24 +1,27 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 // Activity # 5
 // Calling an API
-// Topic: Anime films
+// Topic: GOT Houses
 using System;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Diagnostics;
-using MyApp.WebAPIClient;
+using System.Runtime.CompilerServices;
+using System.Linq.Expressions;
 
-namespace MyApp // Note: actual namespace depends on the project name.
+namespace WebAPIClient
 {
-    internal class Program
+    class Program
     {
         private static readonly HttpClient client = new HttpClient();
+
         static async Task Main(string[] args)
         {
             await ProcessRepositories();
         }
+
+    
 
         private static async Task ProcessRepositories()
         {
@@ -26,76 +29,44 @@ namespace MyApp // Note: actual namespace depends on the project name.
             {
                 try
                 {
-                    Console.WriteLine("Enter film name. Press Enter without writing a film name to quit the program.");
+                    Console.WriteLine("Enter a number to display the info of the Game of Thrones houses. Press Enter without a name to quit the program.");
 
-                    var characterNumber = Console.ReadLine();
-                    
-                    
-                    
-                    if (string.IsNullOrEmpty(characterNumber))
+                    var input = Console.ReadLine();
+                    if (string.IsNullOrEmpty(input))
                     {
                         break;
                     }
-                    
-                 
 
-                    var result = await client.GetAsync("https://www.anapioficeandfire.com/api/characters/" + characterNumber);
+                    var result = await client.GetAsync("https://www.anapioficeandfire.com/api/houses/" + input);
                     var resultRead = await result.Content.ReadAsStringAsync();
+                    var gameofThrones = JsonConvert.DeserializeObject<Got>(resultRead);
 
-                    //*****xxxxxxxxx********
-
-                    var got = JsonConvert.DeserializeObject<Got>(resultRead);
-                    Console.WriteLine("---");
-                    Console.WriteLine("Title: " + got.Gender);
-                    Console.WriteLine("Producer: " + got.Culture);
-                    Console.WriteLine("Score: " + got.Aliases);
-                    //Console.WriteLine("Height: " + pokémon.Height);
-                    Console.WriteLine("Type(s):");
-                    got.Types.ForEach(t => Console.Write(" " + t.Type.Aliases));
-                    Console.WriteLine("\n---");
+                    Console.WriteLine("House in Game of Thrones ");
+                    Console.WriteLine("Name: " + gameofThrones.Name);
+                    Console.WriteLine("Region: " + gameofThrones.Region);
+                    Console.WriteLine("Coat of Arms: " + gameofThrones.CoatOfArms);
 
                 }
 
                 catch (Exception)
                 {
-                    Console.WriteLine("ERROR. Please enter a valid character number!");
+                    Console.WriteLine("ERROR. Please, enter a valid number!");
                 }
+
             }
         }
     }
 
-        namespace WebAPIClient
+    class Got
     {
-        class Got
-        {
-            [JsonProperty("gender")]
-            public string Gender { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
-            [JsonProperty("culture")]
-            public string Culture { get; set; }
-            
-            [JsonProperty("aliases")]
-            public string Aliases {get; set; }
+        [JsonProperty("region")]
+        public string Region { get; set; }
 
-            //[JsonProperty("height")]
-            //public string Height { get; set; }
-
-            public List<Types> Types { get; set; }
-        }
-
-        public class Type
-        {
-            [JsonProperty("aliases")]
-            public string Aliases { get; set; }
-
-        }
-
-        public class Types
-        {
-            [JsonProperty("type")]
-            public Type Type;
-        }
+        [JsonProperty("coatofArms")]
+        public string CoatOfArms { get; set; }
 
     }
-
 }
